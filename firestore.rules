@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /missoes/{missaoId} {
+      allow read, delete: if true;
+      allow create: if request.resource.data.titulo is string
+        && request.resource.data.titulo.size() > 0
+        && request.resource.data.dificuldade in ['Fácil', 'Médio', 'Difícil']
+        && request.resource.data.pontos in [10, 20, 30]
+        && request.resource.data.concluida == false;
+      allow update: if request.resource.data.diff(resource.data).affectedKeys()
+        .hasOnly(['titulo', 'dificuldade', 'pontos', 'concluida', 'data']);
+    }
+  }
+}
